@@ -4,7 +4,6 @@ import (
 	"CRUD/entity1"
 	"CRUD/handler"
 	"CRUD/service"
-	"assignment/crud/handler"
 	"database/sql"
 	"encoding/json"
 	"fmt"
