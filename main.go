@@ -1,15 +1,16 @@
 package main
 
 import (
-	"CRUD/entity1"
-	"CRUD/handler"
-	"CRUD/service"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/KristianXi3/crud/entity1"
+	"github.com/KristianXi3/crud/handler"
+	"github.com/KristianXi3/crud/service"
 
 	"github.com/gorilla/mux"
 )

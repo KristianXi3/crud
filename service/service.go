@@ -1,8 +1,9 @@
 package service
 
 import (
-	"CRUD/entity1"
 	"fmt"
+
+	"github.com/KristianXi3/crud/entity1"
 )
 
 type UserServiceIface interface {

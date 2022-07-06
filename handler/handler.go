@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"CRUD/entity1"
+	"github.com/KristianXi3/crud/entity1"
 
 	"encoding/json"
 	"fmt"
@@ -62,55 +62,6 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func UsersHandler(w http.ResponseWriter, r *http.Request) {
-// 	params := mux.Vars(r)
-// 	id := params["id"]
-
-// 	switch r.Method {
-// 	case http.MethodGet:
-// 		if id != "" { // get by id
-// 			getUsersByIDHandler(w, r, id)
-// 		} else { // get all
-// 			getUsersHandler(w, r)
-// 		}
-// 	case http.MethodPost:
-// 		createUsersHandler(w, r)
-// 	case http.MethodPut:
-// 		updateUserHandler(w, r, id)
-// 	case http.MethodDelete:
-// 		deleteUserHandler(w, r, id)
-// 	}
-// }
-
-// func getUsersByIDHandler(w http.ResponseWriter, r *http.Request, id string) {
-// 	if v, ok := users[id]; ok {
-// 		w.Header().Add("Content-Type", "application/json")
-// 		json, _ := json.Marshal(v)
-// 		w.Write(json)
-// 	}
-// }
-
-// func (h *UsersHandler) getUsersHandler(w http.ResponseWriter, r *http.Request) {
-// 	ctx := context.Background()
-// 	rows, err := h.postgrespool.Query(ctx, "select * from public.user")
-// 	if err != nil {
-// 		fmt.Println("query row error", err)
-// 	}
-// 	defer rows.Close()
-
-// 	users := []*entity1.User{}
-// 	for rows.Next() {
-// 		var user entity1.User
-// 		if serr := rows.Scan(&user.Id, &user.Username, &user.Email, &user.Password, &user.Age, &user.CreatedAt, &user.UpdatedAt); serr != nil {
-// 			fmt.Println("Scan error", serr)
-// 		}
-// 		users = append(users, &user)
-// 	}
-
-// 	jsonData, _ := json.Marshal(&users)
-// 	w.Header().Add("Content-Type", "application/json")
-// 	w.Write(jsonData)
-// }
 func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	json, _ := json.Marshal(users)
@@ -118,6 +69,7 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUsersByIDHandler(w http.ResponseWriter, r *http.Request, id string) {
+	users, err := SqlConnect.Getuser
 	if idInt, err := strconv.Atoi(id); err == nil {
 		if user, ok := users[idInt]; ok {
 			jsonData, _ := json.Marshal(user)
