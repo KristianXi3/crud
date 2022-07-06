@@ -2,14 +2,15 @@ package main
 
 import (
 	"CRUD/entity1"
+	"CRUD/handler"
 	"CRUD/service"
-	"assignment/crud/handler"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	_ "github.com/go-sql-driver/gofreetds"
 	"github.com/gorilla/mux"
 )
 
@@ -24,11 +25,6 @@ func main() {
 	r.HandleFunc("/user/{id}", userHandler.UsersHandler)
 	http.Handle("/", r)
 	http.ListenAndServe(PORT, nil)
-	// r.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
-	// 	if r.Method == "GET"
-	// 	// an example API handler
-	// 	json.NewEncoder(w).Encode(map[string]bool{"ok": true})
-	// })
 
 	srv := &http.Server{
 		Handler:      r,
@@ -39,31 +35,10 @@ func main() {
 
 	log.Fatal(srv.ListenAndServe())
 
-	// userSvc := service.NewUserService()
-
-	// userSvc.Register(&entity1.User{
-	// 	Id:        1,
-	// 	Username:  "Kristian",
-	// 	Email:     "email@email.com",
-	// 	Password:  "Password",
-	// 	Age:       17,
-	// 	CreatedAt: time.Now(),
-	// 	UpdatedAt: time.Now(),
-	// })
-
 }
 
 func userRegister(w http.ResponseWriter, r *http.Request) {
 	userSvc := service.NewUserService()
-	// newUser := &entity.User{
-	// 	Id:        1,
-	// 	Username:  "david123",
-	// 	Email:     "david123@gmail.com",
-	// 	Password:  "Passdav!d",
-	// 	Age:       17,
-	// 	CreatedAt: time.Now(),
-	// 	UpdatedAt: time.Now(),
-	// }
 
 	decoder := json.NewDecoder(r.Body)
 	var newUser entity1.User
@@ -119,9 +94,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("error decoding json body"))
 
 		}
-		// userSvc1 := userSvc.Register(&user)
-		// json, _ := json.Marshal(userSvc1)
-		// w.Write(json)
+
 	}
 
 }
@@ -149,36 +122,3 @@ var users = map[int]entity1.User{
 		Age:      9,
 	},
 }
-
-// func UsersHandler(w http.ResponseWriter, r *http.Request) {
-// 	params := mux.Vars(r)
-// 	id := params["id"]
-// 	checkHandler := handler.UserHandlerInterface
-// 	switch r.Method {
-// 	case http.MethodGet:
-// 		if id != "" { // get by id
-// 			checkHandler.getUsersByIDHandler(w, r, id)
-// 		} else { // get all
-// 			checkHandler.getcompleteuser(w, r)
-// 		}
-// 	case http.MethodPost:
-// 		checkHandler.createUsersHandler(w, r)
-// 	case http.MethodPut:
-// 		checkHandler.updateUserHandler(w, r, id)
-// 	case http.MethodDelete:
-// 		checkHandler.deleteUserHandler(w, r, id)
-// 	}
-// }
-
-// func getcompleteuser(w http.ResponseWriter, r *http.Request) {
-// 	x := []entity1.User{}
-// 	for _, val := range users {
-// 		x = append(x, val)
-// 	}
-// 	check, _ := json.Marshal(x)
-// 	w.Header().Add("Content-Type", "application/json")
-// 	w.Write(check)
-// }
-// func createUsersHandler(w http.ResponseWriter, r *http.Request){
-
-// }
