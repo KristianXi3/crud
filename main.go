@@ -4,19 +4,29 @@ import (
 	"CRUD/entity1"
 	"CRUD/handler"
 	"CRUD/service"
+	"assignment/crud/handler"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	_ "github.com/go-sql-driver/gofreetds"
 	"github.com/gorilla/mux"
 )
 
 var PORT = ":8080"
+var server = "localhost"
+var port = 1433
+var database = "GoLang"
+
+var db *sql.DB
 
 func main() {
+	connString := fmt.Sprintf("server=%s;port=%d; database = %s",
+		server, port, database, "trusted_connection=yes")
+	sql := database.ConnectSQL(connString)
+	handler.SqlConnect = sql
 	r := mux.NewRouter()
 	userHandler := handler.NewUserHandler()
 	//r.HandleFunc("/", greet)
