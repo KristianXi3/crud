@@ -9,7 +9,7 @@ import (
 	"github.com/KristianXi3/crud/entity1"
 )
 
-func (s *dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
+func (s *Dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
 	var result []entity1.User
 
 	err := s.SqlDb.PingContext(ctx)
@@ -44,7 +44,7 @@ func (s *dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
 	return result, nil
 }
 
-func (s *dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, error) {
+func (s *Dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, error) {
 	result := &entity1.User{}
 
 	err := s.SqlDb.PingContext(ctx)
@@ -77,7 +77,7 @@ func (s *dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, 
 	return result, nil
 }
 
-func (s *dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, error) {
+func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, error) {
 	var result string
 
 	err := s.SqlDb.PingContext(ctx)
@@ -103,7 +103,7 @@ func (s *dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, e
 	return result, nil
 }
 
-func (s *dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User) (string, error) {
+func (s *Dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User) (string, error) {
 	var result string
 
 	err := s.SqlDb.PingContext(ctx)
@@ -129,7 +129,7 @@ func (s *dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User
 	return result, nil
 }
 
-func (s *dbstruct) DeleteUser(ctx context.Context, userId int) (string, error) {
+func (s *Dbstruct) DeleteUser(ctx context.Context, userId int) (string, error) {
 	var result string
 
 	err := s.SqlDb.PingContext(ctx)

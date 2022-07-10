@@ -7,13 +7,13 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-type dbstruct struct {
+type Dbstruct struct {
 	Connstr string
 	SqlDb   *sql.DB
 }
 
-func ConnectSQL(connstr string) *dbstruct {
-	con := dbstruct{
+func ConnectSQL(connstr string) *Dbstruct {
+	con := Dbstruct{
 		Connstr: connstr,
 	}
 
