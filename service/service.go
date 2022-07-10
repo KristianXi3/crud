@@ -18,7 +18,7 @@ func NewUserService() UserServiceIface {
 	return &UserSvc{}
 }
 
-func (u *UserSvc) Register(user *entity1.User) entity1.User {
+func (u *UserSvc) Register(user *entity1.User) *entity1.User {
 	if _, ok := u.ListUser[user.Username]; ok {
 		fmt.Println("Gagal, silahkan gunakan username lainnya")
 	} else {
@@ -26,5 +26,5 @@ func (u *UserSvc) Register(user *entity1.User) entity1.User {
 	}
 
 	fmt.Println(user)
-	return *user
+	return user
 }

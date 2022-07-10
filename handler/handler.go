@@ -39,9 +39,13 @@ type UserHandlerInterface interface {
 	UsersHandler(w http.ResponseWriter, r *http.Request)
 }
 
+type UserHandler struct {
+	//postgrespool *pgxpool.Pool
+}
+
 func NewUserHandler() UserHandlerInterface {
 	//return &UserHandler{postgrespool: postgrespool}
-	return &users{}
+	return &UserHandler{}
 }
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
