@@ -86,14 +86,14 @@ func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, e
 		return "", err
 	}
 
-	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createddate, updatedate) values (@id, @username, @email, @password, @age, @createdat, @updatedat)",
+	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createddate, updatedate) values (@id, @username, @email, @password, @age, @createdate, @updatedate)",
 		sql.Named("id", user.Id),
 		sql.Named("username", user.Username),
 		sql.Named("email", user.Email),
 		sql.Named("password", user.Password),
 		sql.Named("age", user.Age),
-		sql.Named("createdat", time.Now()),
-		sql.Named("updatedat", time.Now()))
+		sql.Named("createdate", time.Now()),
+		sql.Named("updatedate", time.Now()))
 	if err != nil {
 		return "", err
 	}
@@ -112,13 +112,13 @@ func (s *Dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User
 		return "", err
 	}
 
-	_, err = s.SqlDb.ExecContext(ctx, "update users set username = @username,email = @email, password = @password, age = @age, updatedate = @updatedat where id = @id",
+	_, err = s.SqlDb.ExecContext(ctx, "update users set username = @username,email = @email, password = @password, age = @age, updatedate = @updatedate where id = @id",
 		sql.Named("id", userId),
 		sql.Named("username", user.Username),
 		sql.Named("email", user.Email),
 		sql.Named("password", user.Password),
 		sql.Named("age", user.Age),
-		sql.Named("updatedat", time.Now()))
+		sql.Named("updatedate", time.Now()))
 	if err != nil {
 		log.Fatal(err)
 		return "", err
