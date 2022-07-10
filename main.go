@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/KristianXi3/crud/DB"
 	"github.com/KristianXi3/crud/handler"
@@ -50,14 +52,14 @@ func main() {
 	http.Handle("/", r)
 	http.ListenAndServe(PORT, nil)
 
-	// srv := &http.Server{
-	// 	Handler:      r,
-	// 	Addr:         "127.0.0.1:8000",
-	// 	WriteTimeout: 15 * time.Second,
-	// 	ReadTimeout:  15 * time.Second,
-	// }
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         "127.0.0.1:8000",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
 
-	// log.Fatal(srv.ListenAndServe())
+	log.Fatal(srv.ListenAndServe())
 
 }
 
