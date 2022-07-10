@@ -3,9 +3,11 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/KristianXi3/crud/DB"
 )
 
-var SqlConnect *DB.dbstruct
+var SqlConnect *DB.Dbstruct
 
 type response struct {
 	Status int         `json:"status"`

@@ -52,6 +52,7 @@ func (h *UserHandler) UsersHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
+		// fmt.Println("TestGet")
 		if id != "" { // get by id
 			getUsersByIDHandler(w, r, id)
 		} else { // get all

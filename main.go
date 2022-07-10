@@ -1,12 +1,8 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"time"
 
 	"github.com/KristianXi3/crud/DB"
 	"github.com/KristianXi3/crud/handler"
@@ -19,35 +15,33 @@ var server = "localhost"
 var port = 1433
 var database = "GoLang"
 
-var db *sql.DB
+// var db *sql.DB
 
-var SqlConnect *DB.dbstruct
+// type response struct {
+// 	Status int         `json:"status"`
+// 	Data   interface{} `json:"data"`
+// }
 
-type response struct {
-	Status int         `json:"status"`
-	Data   interface{} `json:"data"`
-}
+// const (
+// 	statusSuccess int = 0
+// 	statusError   int = 1
+// )
 
-const (
-	statusSuccess int = 0
-	statusError   int = 1
-)
+// func writeJsonResp(w http.ResponseWriter, status int, obj interface{}) {
 
-func writeJsonResp(w http.ResponseWriter, status int, obj interface{}) {
-
-	resp := response{
-		Status: status,
-		Data:   obj,
-	}
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(resp)
-}
+// 	resp := response{
+// 		Status: status,
+// 		Data:   obj,
+// 	}
+// 	w.Header().Set("Content-Type", "application/json")
+// 	_ = json.NewEncoder(w).Encode(resp)
+// }
 
 func main() {
-	connString := fmt.Sprintf("server=%s;port=%d; database = %s",
-		server, port, database, "trusted_connection=yes")
+	connString := fmt.Sprintf("server=%s;port=%d; database=%s ;trusted_connection=yes",
+		server, port, database)
 	sql := DB.ConnectSQL(connString)
-	DB.SqlConnect = sql
+	handler.SqlConnect = sql
 	r := mux.NewRouter()
 	userHandler := handler.NewUserHandler()
 	//r.HandleFunc("/", greet)
@@ -56,14 +50,14 @@ func main() {
 	http.Handle("/", r)
 	http.ListenAndServe(PORT, nil)
 
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         "127.0.0.1:8000",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
+	// srv := &http.Server{
+	// 	Handler:      r,
+	// 	Addr:         "127.0.0.1:8000",
+	// 	WriteTimeout: 15 * time.Second,
+	// 	ReadTimeout:  15 * time.Second,
+	// }
 
-	log.Fatal(srv.ListenAndServe())
+	// log.Fatal(srv.ListenAndServe())
 
 }
 

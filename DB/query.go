@@ -18,7 +18,7 @@ func (s *Dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
 		return nil, err
 	}
 
-	rows, err := s.SqlDb.QueryContext(ctx, "select id, username, email, password, age, createdat, updatedat from users")
+	rows, err := s.SqlDb.QueryContext(ctx, "select id, username, email, password, age, createddate, updatedate from users")
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -53,7 +53,7 @@ func (s *Dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, 
 		return nil, err
 	}
 
-	rows, err := s.SqlDb.QueryContext(ctx, "select id, username, email, password, age, createdat, updatedat from users where id = @ID", sql.Named("ID", userid))
+	rows, err := s.SqlDb.QueryContext(ctx, "select id, username, email, password, age, createddate, updatedate from users where id = @ID", sql.Named("ID", userid))
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -86,7 +86,7 @@ func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, e
 		return "", err
 	}
 
-	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createdat, updatedat) values (@id, @username, @email, @password, @age, @createdat, @updatedat)",
+	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createddate, updatedate) values (@id, @username, @email, @password, @age, @createdat, @updatedat)",
 		sql.Named("id", user.Id),
 		sql.Named("username", user.Username),
 		sql.Named("email", user.Email),
@@ -112,7 +112,7 @@ func (s *Dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User
 		return "", err
 	}
 
-	_, err = s.SqlDb.ExecContext(ctx, "update users set username = @username,email = @email, password = @password, age = @age, updatedat = @updatedat where id = @id",
+	_, err = s.SqlDb.ExecContext(ctx, "update users set username = @username,email = @email, password = @password, age = @age, updatedate = @updatedat where id = @id",
 		sql.Named("id", userId),
 		sql.Named("username", user.Username),
 		sql.Named("email", user.Email),
