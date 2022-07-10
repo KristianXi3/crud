@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"github.com/KristianXi3/crud/entity1"
-
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/KristianXi3/crud/entity1"
 
 	"github.com/gorilla/mux"
 )
@@ -40,16 +41,16 @@ type UserHandlerInterface interface {
 }
 
 type UserHandler struct {
-	//postgrespool *pgxpool.Pool
 }
 
 func NewUserHandler() UserHandlerInterface {
 	//return &UserHandler{postgrespool: postgrespool}
 	return &UserHandler{}
 }
-func UsersHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) UsersHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
+
 	switch r.Method {
 	case http.MethodGet:
 		if id != "" { // get by id
@@ -66,10 +67,14 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getUsersHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	json, _ := json.Marshal(users)
-	w.Write(json)
+func (h *UserHandler) getUsersHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+	users, err := SqlConnect.GetUsers(ctx)
+	if err != nil {
+		writeJsonResp(w, statusError, err.Error())
+		return
+	}
+	writeJsonResp(w, statusSuccess, users)
 }
 
 func getUsersByIDHandler(w http.ResponseWriter, r *http.Request, id string) {

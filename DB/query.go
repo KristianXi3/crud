@@ -2,14 +2,15 @@ package DB
 
 import (
 	"context"
-
 	"database/sql"
 	"log"
 	"time"
+
+	"github.com/KristianXi3/crud/entity1"
 )
 
-func (s *Database) GetUsers(ctx context.Context) ([]entity.User, error) {
-	var result []entity.User
+func (s *dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
+	var result []entity1.User
 
 	err := s.SqlDb.PingContext(ctx)
 	if err != nil {
@@ -24,7 +25,7 @@ func (s *Database) GetUsers(ctx context.Context) ([]entity.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var row entity.User
+		var row entity1.User
 		err := rows.Scan(
 			&row.Id,
 			&row.Username,
@@ -43,8 +44,8 @@ func (s *Database) GetUsers(ctx context.Context) ([]entity.User, error) {
 	return result, nil
 }
 
-func (s *Database) GetUserByID(ctx context.Context, userid int) (*entity.User, error) {
-	result := &entity.User{}
+func (s *dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, error) {
+	result := &entity1.User{}
 
 	err := s.SqlDb.PingContext(ctx)
 	if err != nil {
@@ -76,7 +77,7 @@ func (s *Database) GetUserByID(ctx context.Context, userid int) (*entity.User, e
 	return result, nil
 }
 
-func (s *Database) CreateUser(ctx context.Context, user entity.User) (string, error) {
+func (s *dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, error) {
 	var result string
 
 	err := s.SqlDb.PingContext(ctx)
@@ -102,7 +103,7 @@ func (s *Database) CreateUser(ctx context.Context, user entity.User) (string, er
 	return result, nil
 }
 
-func (s *Database) UpdateUser(ctx context.Context, userId int, user entity.User) (string, error) {
+func (s *dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User) (string, error) {
 	var result string
 
 	err := s.SqlDb.PingContext(ctx)
@@ -128,7 +129,7 @@ func (s *Database) UpdateUser(ctx context.Context, userId int, user entity.User)
 	return result, nil
 }
 
-func (s *Database) DeleteUser(ctx context.Context, userId int) (string, error) {
+func (s *dbstruct) DeleteUser(ctx context.Context, userId int) (string, error) {
 	var result string
 
 	err := s.SqlDb.PingContext(ctx)
