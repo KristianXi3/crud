@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/KristianXi3/crud/entity1"
 
@@ -64,21 +65,21 @@ func getOrdersByIDHandler(w http.ResponseWriter, r *http.Request, id string) {
 	}
 }
 func createOrdersHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := context.Background()
 	decoder := json.NewDecoder(r.Body)
 	var order entity1.Order
-	var item entity1.Items
+
 	if err := decoder.Decode(&order); err != nil {
 		w.Write([]byte("error decoding json body"))
 		return
 	}
-
-	order, err := SqlConnect.CreateOrder(ctx, order, item)
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelfunc()
+	result, err := SqlConnect.CreateOrder(ctx, order)
 	if err != nil {
-		writeJsonResp(w, statusError, err.Error())
+		w.Write([]byte(err.Error()))
 		return
 	}
-	writeJsonResp(w, statusSuccess, order)
+	w.Write([]byte(result))
 }
 
 func updateOrdersHandler(w http.ResponseWriter, r *http.Request, orderid string) {
