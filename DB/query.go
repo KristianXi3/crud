@@ -12,12 +12,6 @@ import (
 func (s *Dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
 	var result []entity1.User
 
-	err := s.SqlDb.PingContext(ctx)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-
 	rows, err := s.SqlDb.QueryContext(ctx, "select id, username, email, password, age, createddate, updatedate from users")
 	if err != nil {
 		log.Fatal(err)
@@ -47,12 +41,6 @@ func (s *Dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
 func (s *Dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, error) {
 	result := &entity1.User{}
 
-	err := s.SqlDb.PingContext(ctx)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-
 	rows, err := s.SqlDb.QueryContext(ctx, "select id, username, email, password, age, createddate, updatedate from users where id = @ID", sql.Named("ID", userid))
 	if err != nil {
 		log.Fatal(err)
@@ -77,23 +65,16 @@ func (s *Dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, 
 	return result, nil
 }
 
-func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, error) {
-	var result string
+func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (result string, err error) {
 
-	err := s.SqlDb.PingContext(ctx)
-	if err != nil {
-		log.Fatal(err)
-		return "", err
-	}
-
-	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createddate, updatedate) values (@id, @username, @email, @password, @age, @createdate, @updatedate)",
+	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createddate, updatedate) values (@id, @username, @email, @password, @age, @now, @now)",
 		sql.Named("id", user.Id),
 		sql.Named("username", user.Username),
 		sql.Named("email", user.Email),
 		sql.Named("password", user.Password),
 		sql.Named("age", user.Age),
-		sql.Named("createdate", time.Now()),
-		sql.Named("updatedate", time.Now()))
+		sql.Named("now", time.Now()),
+	)
 	if err != nil {
 		return "", err
 	}
@@ -103,22 +84,15 @@ func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (string, e
 	return result, nil
 }
 
-func (s *Dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User) (string, error) {
-	var result string
+func (s *Dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User) (result string, err error) {
 
-	err := s.SqlDb.PingContext(ctx)
-	if err != nil {
-		log.Fatal(err)
-		return "", err
-	}
-
-	_, err = s.SqlDb.ExecContext(ctx, "update users set username = @username,email = @email, password = @password, age = @age, updatedate = @updatedate where id = @id",
+	_, err = s.SqlDb.ExecContext(ctx, "update users set username = @username,email = @email, password = @password, age = @age, updatedate = @now where id = @id",
 		sql.Named("id", userId),
 		sql.Named("username", user.Username),
 		sql.Named("email", user.Email),
 		sql.Named("password", user.Password),
 		sql.Named("age", user.Age),
-		sql.Named("updatedate", time.Now()))
+		sql.Named("now", time.Now()))
 	if err != nil {
 		log.Fatal(err)
 		return "", err
@@ -129,16 +103,110 @@ func (s *Dbstruct) UpdateUser(ctx context.Context, userId int, user entity1.User
 	return result, nil
 }
 
-func (s *Dbstruct) DeleteUser(ctx context.Context, userId int) (string, error) {
-	var result string
+func (s *Dbstruct) DeleteUser(ctx context.Context, userId int) (result string, err error) {
 
-	err := s.SqlDb.PingContext(ctx)
+	_, err = s.SqlDb.ExecContext(ctx, "delete from users where id=@id", sql.Named("id", userId))
 	if err != nil {
 		log.Fatal(err)
 		return "", err
 	}
 
-	_, err = s.SqlDb.ExecContext(ctx, "delete from users where id=@id", sql.Named("id", userId))
+	result = "Deleted"
+
+	return result, nil
+}
+
+//This part is for Order entity
+func (s *Dbstruct) GetOrders(ctx context.Context) ([]entity1.Order, error) {
+	var result []entity1.Order
+
+	rows, err := s.SqlDb.QueryContext(ctx, "EXEC dbo.usp_Get_Order")
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var row entity1.Order
+		err := rows.Scan(
+			&row.Order_id,
+			&row.Customer_name,
+			&row.Ordered_at,
+		)
+		if err != nil {
+			log.Fatal(err)
+			return nil, err
+		}
+		result = append(result, row)
+	}
+	return result, nil
+}
+
+func (s *Dbstruct) GetOrderByID(ctx context.Context, orderid int) (*entity1.Order, error) {
+	result := &entity1.Order{}
+
+	rows, err := s.SqlDb.QueryContext(ctx, "EXEC dbo.usp_Get_Order @ID = @ID", sql.Named("ID", orderid))
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(
+			&result.Order_id,
+			&result.Customer_name,
+			&result.Ordered_at,
+		)
+		if err != nil {
+			log.Fatal(err)
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
+func (s *Dbstruct) CreateOrder(ctx context.Context, order entity1.Order, item entity1.Items) (result string, err error) {
+
+	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Create_Order @CustomerName = @cname, @OrderedAt = @orderedat, @ItemCode = @itemcode, @IDesc = @idesc,@IQty = @iqty)",
+		sql.Named("cname", order.Customer_name),
+		sql.Named("orderedat", time.Now()),
+		sql.Named("itemcode", item.Item_code),
+		sql.Named("idesc", item.Description),
+		sql.Named("iqty", item.Quantity),
+	)
+	if err != nil {
+		return "", err
+	}
+
+	result = "Inserted"
+
+	return result, nil
+}
+
+func (s *Dbstruct) UpdateOrder(ctx context.Context, orderid int, order entity1.Order, item entity1.Items) (result string, err error) {
+
+	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Update_Order @OrderId = @orderid,@ItemId = @itemid,@CustomerName = @custname,@OrderedAt = @orderat,@ItemCode = @icode, @Idesc = @idesc, @IQty = @iqty",
+		sql.Named("orderid", orderid),
+		sql.Named("itemid", item.Item_id),
+		sql.Named("custname", order.Customer_name),
+		sql.Named("orderat", time.Now()),
+		sql.Named("icode", item.Item_code),
+		sql.Named("idesc", item.Description),
+		sql.Named("iqty", item.Quantity),
+	)
+	if err != nil {
+		log.Fatal(err)
+		return "", err
+	}
+
+	result = "Updated"
+
+	return result, nil
+}
+
+func (s *Dbstruct) DeleteOrder(ctx context.Context, orderId int) (result string, err error) {
+
+	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Delete_Order", sql.Named("id", orderId))
 	if err != nil {
 		log.Fatal(err)
 		return "", err
