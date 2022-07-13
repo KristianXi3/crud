@@ -21,7 +21,7 @@ type OrderHandler struct {
 func NewOrderHandler() OrderHandlerInterface {
 	return &OrderHandler{}
 }
-func (h *UserHandler) OrdersHandler(w http.ResponseWriter, r *http.Request) {
+func (h *OrderHandler) OrdersHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
 

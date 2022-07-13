@@ -165,25 +165,26 @@ func (s *Dbstruct) GetOrderByID(ctx context.Context, orderid int) (*entity1.Orde
 	return result, nil
 }
 
-func (s *Dbstruct) CreateOrder(ctx context.Context, order entity1.Order, item entity1.Items) (result string, err error) {
+func (s *Dbstruct) CreateOrder(ctx context.Context, order entity1.Order, item entity1.Items) (result entity1.Order, err error) {
 
 	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Create_Order @CustomerName = @cname, @OrderedAt = @orderedat, @ItemCode = @itemcode, @IDesc = @idesc,@IQty = @iqty)",
+		//_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Create_Order @CustomerName = @cname, @OrderedAt = @orderedat)",
 		sql.Named("cname", order.Customer_name),
 		sql.Named("orderedat", time.Now()),
 		sql.Named("itemcode", item.Item_code),
 		sql.Named("idesc", item.Description),
 		sql.Named("iqty", item.Quantity),
 	)
-	if err != nil {
-		return "", err
-	}
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	result = "Inserted"
+	// result = "Inserted"
 
 	return result, nil
 }
 
-func (s *Dbstruct) UpdateOrder(ctx context.Context, orderid int, order entity1.Order, item entity1.Items) (result string, err error) {
+func (s *Dbstruct) UpdateOrder(ctx context.Context, orderid int, order entity1.Order, item entity1.Items) (result entity1.Order, err error) {
 
 	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Update_Order @OrderId = @orderid,@ItemId = @itemid,@CustomerName = @custname,@OrderedAt = @orderat,@ItemCode = @icode, @Idesc = @idesc, @IQty = @iqty",
 		sql.Named("orderid", orderid),
@@ -194,12 +195,6 @@ func (s *Dbstruct) UpdateOrder(ctx context.Context, orderid int, order entity1.O
 		sql.Named("idesc", item.Description),
 		sql.Named("iqty", item.Quantity),
 	)
-	if err != nil {
-		log.Fatal(err)
-		return "", err
-	}
-
-	result = "Updated"
 
 	return result, nil
 }
