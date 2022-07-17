@@ -250,7 +250,6 @@ func (s *Dbstruct) CreateOrder(ctx context.Context, order entity1.Order) (string
 		log.Fatal(err)
 		return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
 	}
-	defer data.Close()
 
 	var lastOrderId int
 	for data.Next() {
@@ -260,43 +259,83 @@ func (s *Dbstruct) CreateOrder(ctx context.Context, order entity1.Order) (string
 			return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
 		}
 	}
-
 	for i := 0; i < len(order.Item); i++ {
-		_, err = s.SqlDb.ExecContext(ctx, "EXEC [dbo].[usp_Create_Order] @CheckUpdate = @checkupdate, @ItemCode = @code,@IDesc = @description,@IQty = @quantity,@OrderId = @order_id)",
-			sql.Named("checkupdate", 1),
+		_, err = s.SqlDb.QueryContext(ctx, "EXEC dbo.usp_Create_Order @CheckUpdate = @checkupdate2 , @ItemCode = @code, @IDesc =  @description, @IQty = @quantity, @OrderId = @order_id",
+			sql.Named("checkupdate2", 1),
 			sql.Named("code", order.Item[i].Item_code),
 			sql.Named("description", order.Item[i].Description),
 			sql.Named("quantity", order.Item[i].Quantity),
 			sql.Named("order_id", lastOrderId))
-
 		if err != nil {
 			log.Fatal(err)
 			return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
 		}
+
 	}
 
 	result = "Order created successfully"
 	return result, nil
 }
 
-func (s *Dbstruct) UpdateOrder(ctx context.Context, orderid int, order entity1.Order, item entity1.Items) (result entity1.Order, err error) {
+// func (s *Dbstruct) UpdateOrder(ctx context.Context, orderid int, order entity1.Order, item entity1.Items) (result entity1.Order, err error) {
+func (s *Dbstruct) UpdateOrder(ctx context.Context, orderid int, order entity1.Order2) (string, error) {
+	end := ""
+	_, err := s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Update_Order @CheckUpdate = 0, @CustomerName = @customer_name, @OrderedAt = @ordered_at,@OrderId = @order_id",
+		sql.Named("customer_name", order.Customer_name),
+		sql.Named("ordered_at", time.Now()),
+		sql.Named("order_id", orderid))
 
-	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Update_Order @OrderId = @orderid,@ItemId = @itemid,@CustomerName = @custname,@OrderedAt = @orderat,@ItemCode = @icode, @Idesc = @idesc, @IQty = @iqty",
-		sql.Named("orderid", orderid),
-		sql.Named("itemid", item.Item_id),
-		sql.Named("custname", order.Customer_name),
-		sql.Named("orderat", time.Now()),
-		sql.Named("icode", item.Item_code),
-		sql.Named("idesc", item.Description),
-		sql.Named("iqty", item.Quantity),
-	)
+	if err != nil {
+		log.Fatal(err)
+		return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
+	}
 
-	return result, nil
+	for i := 0; i < len(order.Item); i++ {
+		var item entity1.ItemsWithoutOrderId
+		exist := false
+		data, err := s.SqlDb.QueryContext(ctx, "EXEC dbo.usp_Get_Item @ID = @itemId, @OrderId = @order_id ",
+			sql.Named("order_id", orderid),
+			sql.Named("itemId", order.Item[i].Item_id))
+
+		if err != nil {
+			log.Fatal(err)
+			return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
+		}
+		defer data.Close()
+
+		for data.Next() {
+			err := data.Scan(&item.Item_id, &item.Item_code, &item.Description, &item.Quantity)
+			if err != nil {
+				log.Fatal(err)
+				return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
+			}
+		}
+
+		if (item != entity1.ItemsWithoutOrderId{}) {
+			_, err := s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Update_Order @CheckUpdate = 1, @ItemCode = @item_code ,@IDesc = @description , @IQty = @quantity , @ItemID = @item_id",
+				sql.Named("item_code", order.Item[i].Item_code),
+				sql.Named("description", order.Item[i].Description),
+				sql.Named("quantity", order.Item[i].Quantity),
+				sql.Named("item_Id", item.Item_id))
+
+			if err != nil {
+				log.Fatal(err)
+				return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
+			}
+			exist = true
+		}
+
+		if !exist {
+			end += fmt.Sprintf("Item id %d not found \n", order.Item[i].Item_id)
+		}
+	}
+	end += "Updated successfully"
+	return end, nil
 }
 
 func (s *Dbstruct) DeleteOrder(ctx context.Context, orderId int) (result string, err error) {
 
-	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Delete_Order", sql.Named("id", orderId))
+	_, err = s.SqlDb.ExecContext(ctx, "EXEC dbo.usp_Delete_Order @OrderId = @id", sql.Named("id", orderId))
 	if err != nil {
 		log.Fatal(err)
 		return "", err

@@ -83,37 +83,29 @@ func createOrdersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateOrdersHandler(w http.ResponseWriter, r *http.Request, orderid string) {
-	ctx := context.Background()
+	if orderid != "" {
+		if idInt, err := strconv.Atoi(orderid); err == nil {
+			decoder := json.NewDecoder(r.Body)
+			var orderSlice entity1.Order2
+			if err := decoder.Decode(&orderSlice); err != nil {
+				w.Write([]byte("Error decoding json body"))
+				return
+			}
 
-	if orderid != "" { // get by id
-		decoder := json.NewDecoder(r.Body)
-		var Order entity1.Order
-		var item entity1.Items
-		if err := decoder.Decode(&Order); err != nil {
-			w.Write([]byte("error decoding json body"))
+			ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancelfunc()
+			result, err := SqlConnect.UpdateOrder(ctx, idInt, orderSlice)
+
+			if err != nil {
+				w.Write([]byte(err.Error()))
+				return
+			}
+			w.Write([]byte(result))
 			return
 		}
-
-		if idInt, err := strconv.Atoi(orderid); err == nil {
-			if idInt != Order.Order_id {
-				writeJsonResp(w, statusError, "No ID not same")
-				return
-			} else if order, err := SqlConnect.GetOrderByID(ctx, idInt); err != nil {
-				writeJsonResp(w, statusError, err.Error())
-				return
-			} else if order.Order_id == 0 {
-				writeJsonResp(w, statusError, "Data not exists")
-				return
-			} else {
-				order, err := SqlConnect.UpdateOrder(ctx, idInt, Order, item)
-				if err != nil {
-					writeJsonResp(w, statusError, err.Error())
-					return
-				}
-				writeJsonResp(w, statusSuccess, order)
-			}
-		}
 	}
+	w.Write([]byte("Invalid parameter"))
+	// return
 }
 
 func deleteOrdersHandler(w http.ResponseWriter, r *http.Request, id string) {

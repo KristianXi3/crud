@@ -1,0 +1,27 @@
+{
+
+    "Order_Id": 46,
+        "Customer_Name": "LookingHereNow",
+        "Items": [
+            {
+                "Item_Id": 13,
+                "Item_Code": "333",
+                "Description": "Huawei Mate 16 D",
+                "Quantity": 100
+            },
+            {
+                "Item_Id": 14,
+                "Item_Code": "Ixha",
+                "Description": "Huawei Nova 7",
+                "Quantity": 100
+            },
+            {
+                "Item_Id": 15,
+                "Item_Code": "HWGT",
+                "Description": "Huawei Watch 3 GT",
+                "Quantity": 200
+            }
+        ]
+
+
+}
