@@ -30,6 +30,8 @@ func main() {
 	orderHandler := handler.NewOrderHandler()
 	r.HandleFunc("/order", orderHandler.OrdersHandler)
 	r.HandleFunc("/order/{id}", orderHandler.OrdersHandler)
+	randHandler := handler.RandUserHandlerFunc()
+	r.HandleFunc("/rand", randHandler.RandUserHandler)
 	http.Handle("/", r)
 	http.ListenAndServe(PORT, nil)
 
