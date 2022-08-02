@@ -345,3 +345,8 @@ func (s *Dbstruct) DeleteOrder(ctx context.Context, orderId int) (result string,
 
 	return result, nil
 }
+
+func (s *Dbstruct) CheckCred(ctx context.Context, login entity1.UserJwt) (*entity1.UserJwt, err error) {
+	rows, err := s.SqlDb.QueryContext(ctx, "select username, password from users where username = ", sql.Named("id", orderId))
+
+}
