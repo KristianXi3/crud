@@ -28,9 +28,8 @@ func main() {
 	//r.HandleFunc("/", greet)
 	r.HandleFunc("/users", userHandler.UsersHandler)
 	r.HandleFunc("/users/{id}", userHandler.UsersHandler)
-	//enterHandler := handler.NewEnterHandler()
-	r.HandleFunc("/users/register", userHandler.UsersHandler) //Isi register
-	r.HandleFunc("/users/login", userHandler.UsersHandler)    //Isi login
+	enterHandler := handler.NewLoginHandler()
+	r.HandleFunc("/login/{id}", enterHandler.LoginsHandler)
 	orderHandler := handler.NewOrderHandler()
 	r.HandleFunc("/order", orderHandler.OrdersHandler)
 	r.HandleFunc("/order/{id}", orderHandler.OrdersHandler)
