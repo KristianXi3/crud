@@ -2,6 +2,8 @@ package entity1
 
 import (
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
 type User struct {
@@ -31,4 +33,8 @@ type Response struct {
 type Error struct {
 	IsError bool   `json:"isError"`
 	Message string `json:"message"`
+}
+type Claims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
 }

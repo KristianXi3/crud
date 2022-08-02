@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/KristianXi3/crud/entity1"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *Dbstruct) GetUsers(ctx context.Context) ([]entity1.User, error) {
@@ -68,12 +69,16 @@ func (s *Dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, 
 }
 
 func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (result string, err error) {
-
+	x, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createddate, updatedate) values (@id, @username, @email, @password, @age, @now, @now)",
 		sql.Named("id", user.Id),
 		sql.Named("username", user.Username),
 		sql.Named("email", user.Email),
-		sql.Named("password", user.Password),
+		sql.Named("password", x),
 		sql.Named("age", user.Age),
 		sql.Named("now", time.Now()),
 	)
@@ -345,8 +350,25 @@ func (s *Dbstruct) DeleteOrder(ctx context.Context, orderId int) (result string,
 
 	return result, nil
 }
+func (s *Dbstruct) LoginsUser(ctx context.Context, userid string) (string, error) {
+	var user entity1.User
+	rows, err := s.SqlDb.QueryContext(ctx, "SELECT username,password FROM users WHERE username = @username",
+		sql.Named("username", userid))
+	if err != nil {
+		log.Fatal(err)
+		return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(
+			&user.Username,
+			&user.Password)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	// fmt.Println(user.Password)
 
-func (s *Dbstruct) CheckCred(ctx context.Context, login entity1.UserJwt) (*entity1.UserJwt, err error) {
-	rows, err := s.SqlDb.QueryContext(ctx, "select username, password from users where username = ", sql.Named("id", orderId))
-
+	re := user.Password
+	return re, nil
 }

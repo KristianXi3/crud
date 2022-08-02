@@ -7,33 +7,8 @@ import (
 	"strconv"
 
 	"github.com/KristianXi3/crud/entity1"
-
 	"github.com/gorilla/mux"
 )
-
-// var users = map[int]entity1.User{
-// 	1: {
-// 		Id:       1,
-// 		Username: "andi123",
-// 		Email:    "andi123@gmail.com",
-// 		Password: "password123",
-// 		Age:      9,
-// 	},
-// 	2: {
-// 		Id:       2,
-// 		Username: "budi123",
-// 		Email:    "budi123@gmail.com",
-// 		Password: "password123",
-// 		Age:      9,
-// 	},
-// 	3: {
-// 		Id:       3,
-// 		Username: "cantya123",
-// 		Email:    "cantya123@gmail.com",
-// 		Password: "password123",
-// 		Age:      9,
-// 	},
-// }
 
 type UserHandlerInterface interface {
 	UsersHandler(w http.ResponseWriter, r *http.Request)
@@ -43,7 +18,6 @@ type UserHandler struct {
 }
 
 func NewUserHandler() UserHandlerInterface {
-	//return &UserHandler{postgrespool: postgrespool}
 	return &UserHandler{}
 }
 func (h *UserHandler) UsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +70,6 @@ func createUsersHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("error decoding json body"))
 		return
 	}
-
 	users, err := SqlConnect.CreateUser(ctx, user)
 	if err != nil {
 		writeJsonResp(w, statusError, err.Error())
