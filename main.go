@@ -29,7 +29,7 @@ func main() {
 	r.HandleFunc("/users", userHandler.UsersHandler)
 	r.HandleFunc("/users/{id}", userHandler.UsersHandler)
 	enterHandler := handler.NewLoginHandler()
-	r.HandleFunc("/login/{id}", enterHandler.LoginsHandler)
+	r.HandleFunc("/login", enterHandler.LoginsHandler)
 	orderHandler := handler.NewOrderHandler()
 	r.HandleFunc("/order", orderHandler.OrdersHandler)
 	r.HandleFunc("/order/{id}", orderHandler.OrdersHandler)

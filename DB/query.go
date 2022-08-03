@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/KristianXi3/crud/entity1"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -69,11 +70,12 @@ func (s *Dbstruct) GetUserByID(ctx context.Context, userid int) (*entity1.User, 
 }
 
 func (s *Dbstruct) CreateUser(ctx context.Context, user entity1.User) (result string, err error) {
-	x, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost)
+	x, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	fmt.Println(x)
 	_, err = s.SqlDb.ExecContext(ctx, "insert into users (id, username, email, password, age, createddate, updatedate) values (@id, @username, @email, @password, @age, @now, @now)",
 		sql.Named("id", user.Id),
 		sql.Named("username", user.Username),
@@ -350,10 +352,13 @@ func (s *Dbstruct) DeleteOrder(ctx context.Context, orderId int) (result string,
 
 	return result, nil
 }
-func (s *Dbstruct) LoginsUser(ctx context.Context, userid string) (string, error) {
+func (s *Dbstruct) LoginsUser(ctx context.Context, cred entity1.Credentials) (string, error) {
 	var user entity1.User
+	// var cred entity1.Credentials
+	var jwtKey = []byte("my_secret_key")
+
 	rows, err := s.SqlDb.QueryContext(ctx, "SELECT username,password FROM users WHERE username = @username",
-		sql.Named("username", userid))
+		sql.Named("username", cred.Username))
 	if err != nil {
 		log.Fatal(err)
 		return fmt.Sprintf("Internal Server Error: %s", err.Error()), err
@@ -367,8 +372,26 @@ func (s *Dbstruct) LoginsUser(ctx context.Context, userid string) (string, error
 			log.Fatal(err)
 		}
 	}
-	// fmt.Println(user.Password)
+	fmt.Println(user.Password, cred.Password)
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(cred.Password))
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	re := user.Password
-	return re, nil
+	expirationTime := time.Now().Add(5 * time.Minute)
+	claims := &entity1.Claims{
+		Username: user.Username,
+		StandardClaims: jwt.StandardClaims{
+			// In JWT, the expiry time is expressed as unix milliseconds
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+
+		return "", err
+	}
+	return tokenString, nil
 }
